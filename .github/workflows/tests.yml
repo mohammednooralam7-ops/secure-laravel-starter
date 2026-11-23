@@ -1,0 +1,18 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, fileinfo
+      - name: Create Laravel app and merge starter
+        run: |
+          composer create-project laravel/laravel app --no-interaction
+          rsync -a --exclude app --exclude .github --exclude .git ./ app/ || true
+          rsync -a ./app/ app/app/ 2>/dev/null || true
+      - name: Info
+        run: echo "Merge starter files into a fresh Laravel app, register middleware as in INSTALL.md, then run php artisan test"
